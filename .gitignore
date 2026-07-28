@@ -1,0 +1,11 @@
+# Rustのビルド生成物
+/target/
+
+# macOS
+.DS_Store
+
+# Visual Studio Codeの個人設定
+.vscode/
+
+# rustfmtが作るバックアップ
+**/*.rs.bk

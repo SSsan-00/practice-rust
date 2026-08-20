@@ -1,0 +1,11 @@
+/Users/shigenobusouga/works/practice-rust/actix-gcd/target/debug/deps/brotli2-628024d713fe130e.d: /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/lib.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/raw.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/bufread.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/read.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/write.rs
+
+/Users/shigenobusouga/works/practice-rust/actix-gcd/target/debug/deps/libbrotli2-628024d713fe130e.rlib: /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/lib.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/raw.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/bufread.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/read.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/write.rs
+
+/Users/shigenobusouga/works/practice-rust/actix-gcd/target/debug/deps/libbrotli2-628024d713fe130e.rmeta: /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/lib.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/raw.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/bufread.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/read.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/write.rs
+
+/Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/lib.rs:
+/Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/raw.rs:
+/Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/bufread.rs:
+/Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/read.rs:
+/Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/brotli2-0.3.2/src/write.rs:

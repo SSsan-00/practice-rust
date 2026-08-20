@@ -1,9 +1,0 @@
-/Users/shigenobusouga/works/practice-rust/actix-gcd/target/debug/deps/tokio_udp-2253f8d2c4ed90c7.d: /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-udp-0.1.6/src/lib.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-udp-0.1.6/src/frame.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-udp-0.1.6/src/recv_dgram.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-udp-0.1.6/src/send_dgram.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-udp-0.1.6/src/socket.rs
-
-/Users/shigenobusouga/works/practice-rust/actix-gcd/target/debug/deps/libtokio_udp-2253f8d2c4ed90c7.rmeta: /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-udp-0.1.6/src/lib.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-udp-0.1.6/src/frame.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-udp-0.1.6/src/recv_dgram.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-udp-0.1.6/src/send_dgram.rs /Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-udp-0.1.6/src/socket.rs
-
-/Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-udp-0.1.6/src/lib.rs:
-/Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-udp-0.1.6/src/frame.rs:
-/Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-udp-0.1.6/src/recv_dgram.rs:
-/Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-udp-0.1.6/src/send_dgram.rs:
-/Users/shigenobusouga/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-udp-0.1.6/src/socket.rs:

@@ -1,5 +1,5 @@
-# Rustのビルド生成物
-/target/
+# Rustのビルド生成物（配下の各Cargoプロジェクト）
+**/target/
 
 # macOS
 .DS_Store

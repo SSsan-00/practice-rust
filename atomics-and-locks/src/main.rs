@@ -15,18 +15,14 @@ use std::{
 };
 
 fn main() {
-    let t1 = thread::spawn(f);
-    let t2 = thread::spawn(f);
+    let numbers = Vec::from_iter(0..=1000);
 
-    println!("Hello from main thread.");
+    let t = thread::spawn(move || {
+        let len = numbers.len();
+        let sum = numbers.into_iter().sum::<usize>();
+        sum / len
+    });
 
-    t1.join().unwrap();
-    t2.join().unwrap();
-}
-
-fn f() {
-    println!("Hello from another thread!");
-
-    let id = thread::current().id();
-    println!("This is my thread id: {id:?}");
+    let average = t.join().unwrap();
+    println!("average: {average}");
 }

@@ -1,3 +1,4 @@
+use std::time::Duration;
 #[allow(unused)]
 use std::{
     cell::{Cell, RefCell, UnsafeCell},
@@ -15,14 +16,29 @@ use std::{
 };
 
 fn main() {
-    let numbers = Vec::from_iter(0..=1000);
+    let queue = Mutex::new(VecDeque::new());
+    let not_empty = Condvar::new();
 
-    let t = thread::spawn(move || {
-        let len = numbers.len();
-        let sum = numbers.into_iter().sum::<usize>();
-        sum / len
+    thread::scope(|s| {
+        s.spawn(|| {
+            loop {
+                let mut q = queue.lock().unwrap();
+                let item = loop {
+                    if let Some(item) = q.pop_front() {
+                        break item;
+                    } else {
+                        q = not_empty.wait(q).unwrap();
+                    }
+                };
+                drop(q);
+                dbg!(item);
+            }
+        });
+
+        for i in 0.. {
+            queue.lock().unwrap().push_back(i);
+            not_empty.notify_one();
+            thread::sleep(Duration::from_secs(1));
+        }
     });
-
-    let average = t.join().unwrap();
-    println!("average: {average}");
 }

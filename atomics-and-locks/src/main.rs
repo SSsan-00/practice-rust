@@ -1,4 +1,3 @@
-use std::time::Duration;
 #[allow(unused)]
 use std::{
     cell::{Cell, RefCell, UnsafeCell},
@@ -15,30 +14,17 @@ use std::{
     thread::{self, Thread},
 };
 
+static X: AtomicI32 = AtomicI32::new(0);
+
 fn main() {
-    let queue = Mutex::new(VecDeque::new());
-    let not_empty = Condvar::new();
+    X.store(1, Relaxed);
+    let t = thread::spawn(f);
+    X.store(2, Relaxed);
+    t.join().unwrap();
+    X.store(3, Relaxed);
+}
 
-    thread::scope(|s| {
-        s.spawn(|| {
-            loop {
-                let mut q = queue.lock().unwrap();
-                let item = loop {
-                    if let Some(item) = q.pop_front() {
-                        break item;
-                    } else {
-                        q = not_empty.wait(q).unwrap();
-                    }
-                };
-                drop(q);
-                dbg!(item);
-            }
-        });
-
-        for i in 0.. {
-            queue.lock().unwrap().push_back(i);
-            not_empty.notify_one();
-            thread::sleep(Duration::from_secs(1));
-        }
-    });
+fn f() {
+    let x = X.load(Relaxed);
+    assert!(x == 1 || x == 2);
 }

@@ -1,4 +1,3 @@
-use std::time::Duration;
 #[allow(unused)]
 use std::{
     cell::{Cell, RefCell, UnsafeCell},
@@ -15,19 +14,23 @@ use std::{
     thread::{self, Thread},
 };
 
-static DATA: AtomicU64 = AtomicU64::new(0);
-static READY: AtomicBool = AtomicBool::new(false);
+static mut DATA: String = String::new();
+static LOCKED: AtomicBool = AtomicBool::new(false);
+
+fn f() {
+    if LOCKED
+        .compare_exchange(false, true, Acquire, Relaxed)
+        .is_ok()
+    {
+        unsafe { DATA.push('!') };
+        LOCKED.store(false, Release);
+    }
+}
 
 fn main() {
-    thread::spawn(|| {
-        DATA.store(123, Relaxed);
-        READY.store(true, Release);
+    thread::scope(|s| {
+        for _ in 0..100 {
+            s.spawn(f);
+        }
     });
-
-    while !READY.load(Acquire) {
-        thread::sleep(Duration::from_millis(100));
-        println!("waiting・・・");
-    }
-
-    println!("{}", DATA.load(Relaxed));
 }

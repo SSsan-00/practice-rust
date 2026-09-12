@@ -1,3 +1,4 @@
+use std::time::Duration;
 #[allow(unused)]
 use std::{
     cell::{Cell, RefCell, UnsafeCell},
@@ -14,20 +15,19 @@ use std::{
     thread::{self, Thread},
 };
 
-static X: AtomicI32 = AtomicI32::new(0);
-static Y: AtomicI32 = AtomicI32::new(0);
+static DATA: AtomicU64 = AtomicU64::new(0);
+static READY: AtomicBool = AtomicBool::new(false);
 
 fn main() {
-    let a = thread::spawn(|| {
-        let x = X.load(Relaxed);
-        Y.store(x, Relaxed);
+    thread::spawn(|| {
+        DATA.store(123, Relaxed);
+        READY.store(true, Release);
     });
-    let b = thread::spawn(|| {
-        let y = Y.load(Relaxed);
-        X.store(y, Relaxed);
-    });
-    a.join().unwrap();
-    b.join().unwrap();
-    assert_eq!(X.load(Relaxed), 0);
-    assert_eq!(Y.load(Relaxed), 0);
+
+    while !READY.load(Acquire) {
+        thread::sleep(Duration::from_millis(100));
+        println!("waiting・・・");
+    }
+
+    println!("{}", DATA.load(Relaxed));
 }

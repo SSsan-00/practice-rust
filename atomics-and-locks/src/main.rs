@@ -14,17 +14,25 @@ use std::{
     thread::{self, Thread},
 };
 
-static X: AtomicI32 = AtomicI32::new(0);
-
 fn main() {
-    X.store(1, Relaxed);
-    let t = thread::spawn(f);
-    X.store(2, Relaxed);
-    t.join().unwrap();
-    X.store(3, Relaxed);
+    let key: String = get_key().to_string();
+    println!("{key}")
 }
 
-fn f() {
-    let x = X.load(Relaxed);
-    assert!(x == 1 || x == 2);
+fn get_key() -> u64 {
+    static KEY: AtomicU64 = AtomicU64::new(0);
+    let key = KEY.load(Relaxed);
+    if key == 0 {
+        let new_key = generate_random_key();
+        match KEY.compare_exchange(0, new_key, Relaxed, Relaxed) {
+            Ok(_) => new_key,
+            Err(k) => k,
+        }
+    } else {
+        key
+    }
+}
+
+fn generate_random_key() -> u64 {
+    1
 }

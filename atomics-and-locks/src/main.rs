@@ -14,23 +14,23 @@ use std::{
     thread::{self, Thread},
 };
 
-static mut DATA: String = String::new();
-static LOCKED: AtomicBool = AtomicBool::new(false);
+static mut DATA: [u64; 10] = [0; 10];
 
-fn f() {
-    if LOCKED
-        .compare_exchange(false, true, Acquire, Relaxed)
-        .is_ok()
-    {
-        unsafe { DATA.push('!') };
-        LOCKED.store(false, Release);
+const ATOMIC_FALSE: AtomicBool = AtomicBool::new(false);
+static READY: [AtomicBool; 10] = [ATOMIC_FALSE; 10];
+
+fn main() {
+    for i in 0..10 {
+        thread::spawn(move || {
+            let data = some_caluculation(&i);
+            unsafe {
+                DATA[i] = data;
+            };
+            READY[i].store(true, Release);
+        });
     }
 }
 
-fn main() {
-    thread::scope(|s| {
-        for _ in 0..100 {
-            s.spawn(f);
-        }
-    });
+fn some_caluculation<'a>(num: &'a u64) -> &'a u64 {
+    &num
 }

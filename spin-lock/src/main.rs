@@ -35,10 +35,6 @@ impl<T> SpinLock<T> {
         }
         Guard { lock: self }
     }
-
-    pub fn unlock(&self) {
-        self.locked.store(false, Release);
-    }
 }
 
 pub struct Guard<'a, T> {

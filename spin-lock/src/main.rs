@@ -14,21 +14,26 @@ use std::{
     thread::{self, Thread},
 };
 
-pub struct SpinLock {
+pub struct SpinLock<T> {
     locked: AtomicBool,
+    value: UnsafeCell<T>,
 }
 
-impl SpinLock {
-    pub const fn new() -> Self {
+unsafe impl<T> Sync for SpinLock<T> where T: Send {}
+
+impl<T> SpinLock<T> {
+    pub const fn new(value: T) -> Self {
         Self {
             locked: AtomicBool::new(false),
+            value: UnsafeCell::new(value),
         }
     }
 
-    pub fn lock(&self) {
+    pub fn lock<'a>(&'a self) -> &'a mut T {
         while self.locked.swap(true, Acquire) {
             std::hint::spin_loop();
         }
+        unsafe { &mut *self.value.get() }
     }
 
     pub fn unlock(&self) {

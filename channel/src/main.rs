@@ -38,7 +38,7 @@ impl<T> Receiver<'_, T> {
     }
 
     pub fn receive(self) -> T {
-        if !self.channel.ready.swap(false, Acquire) {
+        while !self.channel.ready.swap(false, Acquire) {
             thread::park();
         }
         unsafe { (*self.channel.message.get()).assume_init_read() }

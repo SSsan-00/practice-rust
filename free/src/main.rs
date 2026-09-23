@@ -1,25 +1,19 @@
 use std::thread;
-use std::time::Duration;
 
 fn main() {
-    let handle1 = thread::spawn(|| {
-        for i in 1..=5 {
-            println!("スレッドA: {i}");
+    let numbers = vec![10, 20, 30, 40, 50];
 
-            thread::sleep(Duration::from_millis(500));
-        }
+    thread::scope(|s| {
+        s.spawn(|| {
+            println!("スレッドA: {:?}", numbers);
+        });
+
+        s.spawn(|| {
+            let sum: i32 = numbers.iter().sum();
+
+            println!("スレッドB: 合計 = {sum}");
+        });
     });
 
-    let handle2 = thread::spawn(|| {
-        for i in 1..=5 {
-            println!("スレッドB: {i}");
-
-            thread::sleep(Duration::from_millis(500));
-        }
-    });
-
-    handle1.join().unwrap();
-    handle2.join().unwrap();
-
-    println!("全てのスレッドが終了しました!");
+    println!("main: {:?}", numbers);
 }

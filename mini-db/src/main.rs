@@ -30,6 +30,14 @@ impl Database {
     fn remove(&mut self, key: &str) -> Option<String> {
         self.data.remove(key)
     }
+
+    // DB内のデータを返す
+    // 順番の保証はなし
+    fn list(&self) -> impl Iterator<Item = (&str, &str)> + '_ {
+        self.data
+            .iter()
+            .map(|(key, value)| (key.as_str(), value.as_str()))
+    }
 }
 
 enum Command {
@@ -37,6 +45,7 @@ enum Command {
     Set { key: String, value: String },
     Get { key: String },
     Remove { key: String },
+    List,
     Unknown(String),
 }
 
@@ -56,6 +65,7 @@ fn parse_command(input: &str) -> Command {
         ["remove", key] => Command::Remove {
             key: key.to_string(),
         },
+        ["list"] => Command::List,
         _ => Command::Unknown(input.to_string()),
     }
 }
@@ -99,6 +109,11 @@ fn main() -> io::Result<()> {
                 Some(_) => println!("OK"),
                 None => println!("(nil)"),
             },
+            Command::List => {
+                for (key, value) in db.list() {
+                    println!("{key} = {value}");
+                }
+            }
             Command::Unknown(input) => {
                 println!("Unrecognized command '{input}'");
             }
@@ -129,5 +144,16 @@ mod tests {
 
         assert_eq!(db.remove("name"), Some(String::from("Taro")));
         assert_eq!(db.get("name"), None);
+    }
+
+    #[test]
+    fn lists_values() {
+        let mut db = Database::new();
+
+        db.set(String::from("name"), String::from("Taro"));
+
+        let values: Vec<_> = db.list().collect();
+
+        assert_eq!(values, vec![("name", "Taro")]);
     }
 }

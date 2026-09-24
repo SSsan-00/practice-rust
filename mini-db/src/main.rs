@@ -33,6 +33,9 @@ impl Database {
 
     // DB内のデータを返す
     // 順番の保証はなし
+    // Iteratorとして使える値を返す
+    // 値(Item)を取り出した時の中身は(&str, &str)
+    // '_ self(DB)より長く生き残らない
     fn list(&self) -> impl Iterator<Item = (&str, &str)> + '_ {
         self.data
             .iter()

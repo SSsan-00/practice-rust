@@ -43,6 +43,7 @@ enum Command {
 fn parse_command(input: &str) -> Command {
     let words: Vec<&str> = input.split_whitespace().collect();
 
+    // words.as_slice(): &[&str]
     match words.as_slice() {
         [".exit"] => Command::Exit,
         ["set", key, value] => Command::Set {

@@ -96,6 +96,11 @@ impl Database {
     fn clear(&mut self) {
         self.data.clear();
     }
+
+    // 指定したキーがDBに存在するか確認する
+    fn exists(&self, key: &str) -> bool {
+        self.data.contains_key(key)
+    }
 }
 
 enum Command {
@@ -106,6 +111,7 @@ enum Command {
     List,
     Save,
     Clear,
+    Exists { key: String },
     Unknown(String),
 }
 
@@ -128,6 +134,9 @@ fn parse_command(input: &str) -> Command {
         ["list"] => Command::List,
         ["save"] => Command::Save,
         ["clear"] => Command::Clear,
+        ["exists", key] => Command::Exists {
+            key: key.to_string(),
+        },
         _ => Command::Unknown(input.to_string()),
     }
 }
@@ -212,6 +221,13 @@ fn main() -> io::Result<()> {
             Command::Clear => {
                 db.clear();
                 println!("OK");
+            }
+            Command::Exists { key } => {
+                if db.exists(&key) {
+                    println!("true");
+                } else {
+                    println!("false");
+                }
             }
             Command::Unknown(input) => {
                 println!("Unrecognized command '{input}'");
@@ -312,5 +328,14 @@ mod tests {
 
         assert_eq!(db.get("name"), None);
         assert_eq!(db.get("age"), None);
+    }
+
+    #[test]
+    fn checks_if_key_exists() {
+        let mut db = Database::new();
+        db.set(String::from("name"), String::from("Taro"));
+
+        assert!(db.exists("name"));
+        assert!(!db.exists("age"));
     }
 }

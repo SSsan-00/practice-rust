@@ -150,6 +150,23 @@ fn parse_command(input: &str) -> Command {
     }
 }
 
+// 使用できるコマンドとその用途を表示する
+fn print_help() {
+    println!(
+        "Command:
+                set <key> <value> データを保存する
+                get <key>         データを取得する
+                remove <key>      データを削除する
+                list              全データを表示する
+            　　save              ファイルに保存する
+            　　clear             全データを削除する
+            　　exists <key>      キーの有無を確認する
+            　　count             データ件数を表示する
+            　　help              この一覧を表示する
+            　　.exit             終了する"
+    );
+}
+
 fn main() -> io::Result<()> {
     // 入力を受け取る
     let mut input = String::new();
@@ -242,19 +259,7 @@ fn main() -> io::Result<()> {
                 println!("{}", db.count());
             }
             Command::Help => {
-                println!(
-                    "Command:
-                set <key> <value> データを保存する
-                get <key>         データを取得する
-                remove <key>      データを削除する
-                list              全データを表示する
-            　　save              ファイルに保存する
-            　　clear             全データを削除する
-            　　exists <key>      キーの有無を確認する
-            　　count             データ件数を表示する
-            　　help              この一覧を表示する
-            　　.exit             終了する"
-                );
+                print_help();
             }
             Command::Unknown(input) => {
                 println!("Unrecognized command '{input}'");

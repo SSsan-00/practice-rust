@@ -4,7 +4,7 @@ use std::path::Path;
 
 const FORMAT_HEADER: &str = "mini-db-v2\n";
 
-// タブ・改行・バックスラッシュを1行に保存できる形へ変換する
+// タブ・復帰文字・改行・バックスラッシュを1行に保存できる形へ変換する
 fn escape_field(value: &str) -> String {
     let mut escaped = String::new();
 
@@ -91,12 +91,11 @@ impl Database {
 
     // DBの内容をファイルに保存する
     pub fn save(&self, path: &str) -> io::Result<()> {
-        // ヘッダーからファイルを作成する
+        // ヘッダーを保存内容の先頭に設定する
         let mut contents = String::from(FORMAT_HEADER);
 
         // DBに保存されているデータを1件ずつ取り出す
         for (key, value) in self.list() {
-            // key=value\n という形式で文字列へ追加する
             contents.push_str(&escape_field(key));
             contents.push('\t');
             contents.push_str(&escape_field(value));
@@ -133,7 +132,7 @@ impl Database {
                     None => {
                         return Err(io::Error::new(
                             io::ErrorKind::InvalidData,
-                            format!("DBファイルの{}行目にタブがありません", line_number + 1),
+                            format!("DBファイルの{}行目にタブがありません", line_number + 2),
                         ));
                     }
                 };
@@ -141,10 +140,10 @@ impl Database {
                 db.set(unescape_field(key)?, unescape_field(value)?);
             }
         } else {
-            // ヘッダーがなければkey=vlaue形式で読み込む
+            // ヘッダーがなければkey=value形式で読み込む
 
             for (line_number, line) in contents.lines().enumerate() {
-                // タブを境目にkey, valueを分ける
+                // 「=」を境目にkey, valueを分ける
                 let (key, value) = match line.split_once('=') {
                     Some(pair) => pair,
                     None => {
@@ -154,12 +153,11 @@ impl Database {
                         ));
                     }
                 };
-                // エスケープされた文字列を元に戻してDBに保存する
                 db.set(key.to_string(), value.to_string());
             }
         }
 
-        // contentsの各行を読み取り、DBへ登録する
+        // 読み込みが完了したDBを返す
         Ok(db)
     }
 

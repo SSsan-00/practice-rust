@@ -279,7 +279,7 @@ mod tests {
     }
 
     #[test]
-    fn saves_and_loads_value_containing_special_charcters() {
+    fn saves_and_loads_value_containing_special_characters() {
         let path = std::env::temp_dir().join("mini-db-special_value_test.db");
         let _ = fs::remove_file(&path);
 
@@ -289,7 +289,6 @@ mod tests {
         db.set(String::from("message"), value.clone());
         db.save(path.to_str().unwrap()).unwrap();
 
-        // 2行目に「=」がないので、現時点ではエラーを返す
         let loaded_db = Database::load(path.to_str().unwrap()).unwrap();
 
         assert_eq!(loaded_db.get("message"), Some(value.as_str()));

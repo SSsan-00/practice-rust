@@ -69,6 +69,7 @@ enum Command {
     Get { key: String },
     Remove { key: String },
     List,
+    Save,
     Unknown(String),
 }
 
@@ -89,6 +90,7 @@ fn parse_command(input: &str) -> Command {
             key: key.to_string(),
         },
         ["list"] => Command::List,
+        ["save"] => Command::Save,
         _ => Command::Unknown(input.to_string()),
     }
 }
@@ -136,6 +138,10 @@ fn main() -> io::Result<()> {
                 for (key, value) in db.list() {
                     println!("{key} = {value}");
                 }
+            }
+            Command::Save => {
+                db.save("mini.db")?;
+                println!("saved");
             }
             Command::Unknown(input) => {
                 println!("Unrecognized command '{input}'");

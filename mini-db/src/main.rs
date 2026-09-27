@@ -91,6 +91,11 @@ impl Database {
         // contentsの各行を読み取り、DBへ登録する
         Ok(db)
     }
+
+    // DBに保存されているデータを全て削除する
+    fn clear(&mut self) {
+        self.data.clear();
+    }
 }
 
 enum Command {
@@ -100,6 +105,7 @@ enum Command {
     Remove { key: String },
     List,
     Save,
+    Clear,
     Unknown(String),
 }
 
@@ -121,6 +127,7 @@ fn parse_command(input: &str) -> Command {
         },
         ["list"] => Command::List,
         ["save"] => Command::Save,
+        ["clear"] => Command::Clear,
         _ => Command::Unknown(input.to_string()),
     }
 }
@@ -201,6 +208,10 @@ fn main() -> io::Result<()> {
             Command::Save => {
                 db.save("mini.db")?;
                 println!("saved");
+            }
+            Command::Clear => {
+                db.clear();
+                println!("OK");
             }
             Command::Unknown(input) => {
                 println!("Unrecognized command '{input}'");
@@ -287,5 +298,19 @@ mod tests {
 
         // remove
         std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn clears_all_values() {
+        let mut db = Database::new();
+
+        db.set(String::from("name"), String::from("Taro"));
+        db.set(String::from("age"), String::from("20"));
+
+        // 全件削除する
+        db.clear();
+
+        assert_eq!(db.get("name"), None);
+        assert_eq!(db.get("age"), None);
     }
 }

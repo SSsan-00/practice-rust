@@ -277,4 +277,24 @@ mod tests {
         db.set(String::from("age"), String::from("20"));
         assert_eq!(db.count(), 2);
     }
+
+    #[test]
+    fn fails_to_load_value_containing_newline() {
+        let path = std::env::temp_dir().join("mini-db-newline-value-test.db");
+        let _ = fs::remove_file(&path);
+
+        let mut db = Database::new();
+        db.set(
+            String::from("message"),
+            String::from("first line\nsecond line"),
+        );
+
+        db.save(path.to_str().unwrap()).unwrap();
+
+        // 2行目に「=」がないので、現時点ではエラーを返す
+        let result = Database::load(path.to_str().unwrap());
+        assert!(result.is_err());
+
+        fs::remove_file(path).unwrap();
+    }
 }

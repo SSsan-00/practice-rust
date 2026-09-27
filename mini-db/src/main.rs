@@ -151,29 +151,36 @@ fn main() -> io::Result<()> {
 
         match command {
             Command::Exit => {
-                // 終了前に保存するか確認する
-                print!("Save before exit? (y/n): ");
-                io::stdout().flush()?;
+                // 正しい入力が行われるまで処理を繰り返す
+                loop {
+                    // 終了前に保存するか確認する
+                    print!("Save before exit? (y/n): ");
+                    io::stdout().flush()?;
 
-                // 以前のコマンド入力をクリアする
-                input.clear();
+                    // 以前のコマンド入力をクリアする
+                    input.clear();
 
-                io::stdin().read_line(&mut input)?;
+                    io::stdin().read_line(&mut input)?;
 
-                match input.trim() {
-                    "y" | "Y" => {
-                        db.save("mini.db")?;
-                        println!("saved");
-                    }
-                    "n" | "N" => {
-                        // 保存せずにそのまま終了する
-                    }
-                    _ => {
-                        // 一旦保存せずに終了するように実装しておく
-                        // リトライ実装予定
-                        println!("Invalid input. Exit without saving.");
+                    match input.trim() {
+                        "y" | "Y" => {
+                            db.save("mini.db")?;
+                            println!("saved");
+                            break;
+                        }
+                        "n" | "N" => {
+                            // 保存せずにそのまま終了する
+                            break;
+                        }
+                        _ => {
+                            // 一旦保存せずに終了するように実装しておく
+                            // リトライ実装予定
+                            println!("Please enter y or n.");
+                        }
                     }
                 }
+
+                break;
             }
             Command::Set { key, value } => {
                 db.set(key, value);

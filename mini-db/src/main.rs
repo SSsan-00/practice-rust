@@ -61,6 +61,18 @@ impl Database {
 
         Ok(())
     }
+
+    // ファイルからDBを読み込む
+    fn load(path: &str) -> io::Result<Self> {
+        // ファイル全体を文字列として埋め込む
+        let contents = std::fs::read_to_string(path)?;
+
+        // 空のDBを作る
+        let mut db = Self::new();
+
+        // contentsの各行を読み取り、DBへ登録する
+        Ok(db)
+    }
 }
 
 enum Command {

@@ -118,6 +118,7 @@ enum Command {
     Clear,
     Exists { key: String },
     Count,
+    Help,
     Unknown(String),
 }
 
@@ -144,6 +145,7 @@ fn parse_command(input: &str) -> Command {
             key: key.to_string(),
         },
         ["count"] => Command::Count,
+        ["help"] => Command::Help,
         _ => Command::Unknown(input.to_string()),
     }
 }
@@ -238,6 +240,21 @@ fn main() -> io::Result<()> {
             }
             Command::Count => {
                 println!("{}", db.count());
+            }
+            Command::Help => {
+                println!(
+                    "Command:
+                set <key> <value> データを保存する
+                get <key>         データを取得する
+                remove <key>      データを削除する
+                list              全データを表示する
+            　　save              ファイルに保存する
+            　　clear             全データを削除する
+            　　exists <key>      キーの有無を確認する
+            　　count             データ件数を表示する
+            　　help              この一覧を表示する
+            　　.exit             終了する"
+                );
             }
             Command::Unknown(input) => {
                 println!("Unrecognized command '{input}'");

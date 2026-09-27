@@ -101,6 +101,11 @@ impl Database {
     fn exists(&self, key: &str) -> bool {
         self.data.contains_key(key)
     }
+
+    // 保存されているデータ件数を返す
+    fn count(&self) -> usize {
+        self.data.len()
+    }
 }
 
 enum Command {
@@ -112,6 +117,7 @@ enum Command {
     Save,
     Clear,
     Exists { key: String },
+    Count,
     Unknown(String),
 }
 
@@ -137,6 +143,7 @@ fn parse_command(input: &str) -> Command {
         ["exists", key] => Command::Exists {
             key: key.to_string(),
         },
+        ["count"] => Command::Count,
         _ => Command::Unknown(input.to_string()),
     }
 }
@@ -228,6 +235,9 @@ fn main() -> io::Result<()> {
                 } else {
                     println!("false");
                 }
+            }
+            Command::Count => {
+                println!("{}", db.count());
             }
             Command::Unknown(input) => {
                 println!("Unrecognized command '{input}'");
@@ -337,5 +347,15 @@ mod tests {
 
         assert!(db.exists("name"));
         assert!(!db.exists("age"));
+    }
+
+    #[test]
+    fn counts_values() {
+        let mut db = Database::new();
+        assert_eq!(db.count(), 0);
+
+        db.set(String::from("name"), String::from("taro"));
+        db.set(String::from("age"), String::from("20"));
+        assert_eq!(db.count(), 2);
     }
 }

@@ -128,9 +128,9 @@ fn parse_command(input: &str) -> Command {
     // words.as_slice(): &[&str]
     match words.as_slice() {
         [".exit"] => Command::Exit,
-        ["set", key, value] => Command::Set {
+        ["set", key, values @ ..] if !values.is_empty() => Command::Set {
             key: key.to_string(),
-            value: value.to_string(),
+            value: values.join(" "),
         },
         ["get", key] => Command::Get {
             key: key.to_string(),

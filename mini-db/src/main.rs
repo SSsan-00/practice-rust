@@ -70,6 +70,16 @@ impl Database {
         // 空のDBを作る
         let mut db = Self::new();
 
+        // ファイルの内容を1行ずつ取り出す
+        for line in contents.lines() {
+            // 最初に見つかった「=」を境目として、
+            // key, valueの2つに分割する
+            if let Some((key, value)) = line.split_once('=') {
+                // &strをStringに変換してから保存する
+                db.set(key.to_string(), value.to_string());
+            }
+        }
+
         // contentsの各行を読み取り、DBへ登録する
         Ok(db)
     }

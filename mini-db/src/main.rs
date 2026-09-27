@@ -79,13 +79,21 @@ impl Database {
         let mut db = Self::new();
 
         // ファイルの内容を1行ずつ取り出す
-        for line in contents.lines() {
-            // 最初に見つかった「=」を境目として、
-            // key, valueの2つに分割する
-            if let Some((key, value)) = line.split_once('=') {
-                // &strをStringに変換してから保存する
-                db.set(key.to_string(), value.to_string());
-            }
+        for (line_number, line) in contents.lines().enumerate() {
+            // 最初に見つかった「=」を境目として、行番号と合わせてエラーを返す
+            let (key, value) = match line.split_once('=') {
+                Some(pair) => pair,
+                None => {
+                    // 「=」がない行は不正な形式として、行番号と合わせてエラーを返す
+                    return Err(io::Error::new(
+                        io::ErrorKind::InvalidData,
+                        format!("DBファイルの{}行目に「=」がありません", line_number + 1),
+                    ));
+                }
+            };
+
+            // &strをStringに変換してからDBに保存する
+            db.set(key.to_string(), value.to_string());
         }
 
         // contentsの各行を読み取り、DBへ登録する

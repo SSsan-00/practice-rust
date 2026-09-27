@@ -41,6 +41,26 @@ impl Database {
             .iter()
             .map(|(key, value)| (key.as_str(), value.as_str()))
     }
+
+    // DBの内容をファイルに保存する
+    fn save(&self, path: &str) -> io::Result<()> {
+        // ファイルへ書き込む文字列を作る
+        let mut contents = String::new();
+
+        // DBに保存されているデータを1件ずつ取り出す
+        for (key, value) in self.list() {
+            // key=value\n という形式で文字列へ追加する
+            contents.push_str(key);
+            contents.push('=');
+            contents.push_str(value);
+            contents.push('\n');
+        }
+
+        // 指定されたファイルへ文字列を書き込む
+        std::fs::write(path, contents)?;
+
+        Ok(())
+    }
 }
 
 enum Command {

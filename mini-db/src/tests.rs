@@ -124,3 +124,17 @@ fn saves_and_loads_value_containing_special_characters() {
 
     fs::remove_file(path).unwrap();
 }
+
+#[test]
+fn loads_legacy_key_value_format() {
+    // 旧形式のDBファイルを用意する
+    let path = std::env::temp_dir().join("mini-db-legacy-format-test.db");
+    fs::write(&path, "name=Taro\nage=20\n").unwrap();
+
+    let db = Database::load(path.to_str().unwrap()).unwrap();
+
+    assert_eq!(db.get("name"), Some("Taro"));
+    assert_eq!(db.get("age"), Some("20"));
+
+    fs::remove_file(path).unwrap();
+}

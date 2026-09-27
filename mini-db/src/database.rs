@@ -48,47 +48,47 @@ fn unescape_field(value: &str) -> io::Result<String> {
     Ok(unescaped)
 }
 
-/// キーと値をメモリ上に保存するデータベースです。
+/// キーと値をメモリ上に保存するデータベース
 pub struct Database {
     data: HashMap<String, String>,
 }
 
 impl Database {
-    /// 空のデータベースを作成します。
+    /// 空のデータベースを作成
     pub fn new() -> Self {
         Self {
             data: HashMap::new(),
         }
     }
 
-    /// キーと値を保存します。すでにキーがある場合は、値を置き換えます。
+    /// キーと値を保存。キーがすでにあれば値を置き換える
     pub fn set(&mut self, key: String, value: String) {
         self.data.insert(key, value);
     }
 
-    /// キーに対応する値を借用して返します。キーが見つからない場合は `None` を返します。
+    /// キーに対応する値を借用して返す。キーがなければ `None` を返す
     pub fn get(&self, key: &str) -> Option<&str> {
         self.data.get(key).map(String::as_str)
     }
 
-    /// キーと値を削除し、削除した値を返します。キーが見つからない場合は `None` を返します。
+    /// キーと値を削除し、削除した値を返す。キーがなければ `None` を返す
     pub fn remove(&mut self, key: &str) -> Option<String> {
         self.data.remove(key)
     }
 
-    /// 保存されているキーと値を、順不同のイテレーターとして返します。
+    /// 保存されているキーと値を、順不同のイテレーターとして返す
     ///
-    /// 返される文字列スライスは、このデータベースから借用されています。
+    /// 返される文字列スライスは、このデータベースから借用する
     pub fn list(&self) -> impl Iterator<Item = (&str, &str)> + '_ {
         self.data
             .iter()
             .map(|(key, value)| (key.as_str(), value.as_str()))
     }
 
-    /// 現在のデータを指定したファイルへ保存します。
+    /// 現在のデータを指定したファイルへ保存
     ///
     /// # Errors
-    /// ファイルへ書き込めない場合はエラーを返します。
+    /// ファイルへ書き込めない場合はエラーになる
     pub fn save(&self, path: &str) -> io::Result<()> {
         // ヘッダーを保存内容の先頭に設定する
         let mut contents = String::from(FORMAT_HEADER);
@@ -107,12 +107,12 @@ impl Database {
         Ok(())
     }
 
-    /// 指定したファイルからデータベースを読み込みます。
+    /// 指定したファイルからデータベースを読み込む
     ///
-    /// ファイルが存在しない場合は、空のデータベースを作成して保存します。
+    /// ファイルがなければ、空のデータベースを作成して保存する
     ///
     /// # Errors
-    /// ファイルを読み書きできない場合や、ファイル形式が不正な場合はエラーを返します。
+    /// ファイルを読み書きできない場合や、ファイル形式が不正な場合はエラーになる
     pub fn load(path: &str) -> io::Result<Self> {
         // DBファイルがまだ存在しない場合は、空のDBを作成する
         if !Path::new(path).exists() {
@@ -121,7 +121,7 @@ impl Database {
             return Ok(db);
         }
 
-        // ファイル全体を文字列として埋め込む
+        // ファイル全体を文字列として読み込む
         let contents = std::fs::read_to_string(path)?;
 
         // 空のDBを作る
@@ -165,17 +165,17 @@ impl Database {
         Ok(db)
     }
 
-    /// メモリ上のデータをすべて削除します。ファイルへの保存は行いません。
+    /// メモリ上のデータをすべて削除。ファイルには保存しない
     pub fn clear(&mut self) {
         self.data.clear();
     }
 
-    /// 指定したキーが存在するかどうかを返します。
+    /// 指定したキーが存在するかどうかを返す
     pub fn exists(&self, key: &str) -> bool {
         self.data.contains_key(key)
     }
 
-    /// 保存されているデータの件数を返します。
+    /// 保存されているデータの件数を返す
     pub fn count(&self) -> usize {
         self.data.len()
     }

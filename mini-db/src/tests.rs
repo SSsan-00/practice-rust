@@ -58,19 +58,19 @@ fn saves_and_loads_values() {
     // 空のDBを作成する
     let mut db = Database::new();
 
-    // register
+    // 値を登録
     db.set(String::from("name"), String::from("Taro"));
     db.set(String::from("age"), String::from("20"));
     db.save(path.to_str().unwrap()).unwrap();
 
-    // read
+    // ファイルから読み込む
     let loaded_db = Database::load(path.to_str().unwrap()).unwrap();
 
-    // check
+    // 読み込んだ値を確認
     assert_eq!(loaded_db.get("name"), Some("Taro"));
     assert_eq!(loaded_db.get("age"), Some("20"));
 
-    // remove
+    // テスト用ファイルを削除
     std::fs::remove_file(path).unwrap();
 }
 

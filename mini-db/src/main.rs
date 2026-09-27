@@ -47,7 +47,7 @@ fn parse_command(input: &str) -> Command {
     }
 }
 
-/// 使用できるコマンドとその用途を表示します。
+/// 使用可能なコマンドと用途を表示
 fn print_help() {
     println!(
         "Command:
@@ -68,7 +68,7 @@ fn main() -> io::Result<()> {
     // 入力を受け取る
     let mut input = String::new();
 
-    // DBを作成する
+    // DBファイルからデータを読み込む
     let mut db = Database::load("mini.db")?;
     'command_loop: loop {
         // 前回の入力を空にする

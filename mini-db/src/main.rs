@@ -150,7 +150,31 @@ fn main() -> io::Result<()> {
         let command = parse_command(input.trim());
 
         match command {
-            Command::Exit => break,
+            Command::Exit => {
+                // 終了前に保存するか確認する
+                print!("Save before exit? (y/n): ");
+                io::stdout().flush()?;
+
+                // 以前のコマンド入力をクリアする
+                input.clear();
+
+                io::stdin().read_line(&mut input)?;
+
+                match input.trim() {
+                    "y" | "Y" => {
+                        db.save("mini.db")?;
+                        println!("saved");
+                    }
+                    "n" | "N" => {
+                        // 保存せずにそのまま終了する
+                    }
+                    _ => {
+                        // 一旦保存せずに終了するように実装しておく
+                        // リトライ実装予定
+                        println!("Invalid input. Exit without saving.");
+                    }
+                }
+            }
             Command::Set { key, value } => {
                 db.set(key, value);
                 println!("OK")

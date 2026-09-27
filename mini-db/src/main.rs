@@ -128,8 +128,10 @@ fn parse_command(input: &str) -> Command {
     // words.as_slice(): &[&str]
     match words.as_slice() {
         [".exit"] => Command::Exit,
+        // key以降の文字列をまとめてvaluesとしてまとめる[word1, word2, word3・・・]
         ["set", key, values @ ..] if !values.is_empty() => Command::Set {
             key: key.to_string(),
+            // 空白繋ぎで配列要素(values)を展開する[word1 word2 word3 ・・・]
             value: values.join(" "),
         },
         ["get", key] => Command::Get {

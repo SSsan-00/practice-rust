@@ -131,7 +131,7 @@ fn main() -> io::Result<()> {
 
     // DBを作成する
     let mut db = Database::load("mini.db")?;
-    loop {
+    'command_loop: loop {
         // 前回の入力を空にする
         input.clear();
 
@@ -160,27 +160,26 @@ fn main() -> io::Result<()> {
                     // 以前のコマンド入力をクリアする
                     input.clear();
 
-                    io::stdin().read_line(&mut input)?;
+                    if io::stdin().read_line(&mut input)? == 0 {
+                        break 'command_loop;
+                    }
 
                     match input.trim() {
                         "y" | "Y" => {
                             db.save("mini.db")?;
                             println!("saved");
-                            break;
+                            break 'command_loop;
                         }
                         "n" | "N" => {
                             // 保存せずにそのまま終了する
-                            break;
+                            break 'command_loop;
                         }
                         _ => {
-                            // 一旦保存せずに終了するように実装しておく
-                            // リトライ実装予定
+                            // リトライ
                             println!("Please enter y or n.");
                         }
                     }
                 }
-
-                break;
             }
             Command::Set { key, value } => {
                 db.set(key, value);

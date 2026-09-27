@@ -122,8 +122,7 @@ fn main() -> io::Result<()> {
     let mut input = String::new();
 
     // DBを作成する
-    let mut db = Database::new();
-
+    let mut db = Database::load("mini.db")?;
     loop {
         // 前回の入力を空にする
         input.clear();

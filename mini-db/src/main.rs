@@ -279,21 +279,20 @@ mod tests {
     }
 
     #[test]
-    fn fails_to_load_value_containing_newline() {
-        let path = std::env::temp_dir().join("mini-db-newline-value-test.db");
+    fn saves_and_loads_value_containing_special_charcters() {
+        let path = std::env::temp_dir().join("mini-db-special_value_test.db");
         let _ = fs::remove_file(&path);
 
         let mut db = Database::new();
-        db.set(
-            String::from("message"),
-            String::from("first line\nsecond line"),
-        );
+        let value = String::from("first line\nsecond line\\nwith\ttab");
 
+        db.set(String::from("message"), value.clone());
         db.save(path.to_str().unwrap()).unwrap();
 
         // 2行目に「=」がないので、現時点ではエラーを返す
-        let result = Database::load(path.to_str().unwrap());
-        assert!(result.is_err());
+        let loaded_db = Database::load(path.to_str().unwrap()).unwrap();
+
+        assert_eq!(loaded_db.get("message"), Some(value.as_str()));
 
         fs::remove_file(path).unwrap();
     }

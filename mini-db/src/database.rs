@@ -2,6 +2,52 @@ use std::collections::HashMap;
 use std::io;
 use std::path::Path;
 
+const FORMAT_HEADER: &str = "mini-db-v2\n";
+
+// タブ・改行・バックスラッシュを1行に保存できる形へ変換する
+fn escape_field(value: &str) -> String {
+    let mut escaped = String::new();
+
+    for ch in value.chars() {
+        match ch {
+            '\\' => escaped.push_str("\\\\"),
+            '\n' => escaped.push_str("\\n"),
+            '\r' => escaped.push_str("\\r"),
+            '\t' => escaped.push_str("\\t"),
+            _ => escaped.push(ch),
+        }
+    }
+    escaped
+}
+
+// 保存用の表記を元の文字列に戻す
+fn unescape_field(value: &str) -> io::Result<String> {
+    let mut chars = value.chars();
+    let mut unescaped = String::new();
+
+    while let Some(ch) = chars.next() {
+        if ch != '\\' {
+            unescaped.push(ch);
+            continue;
+        }
+
+        match chars.next() {
+            Some('\\') => unescaped.push('\\'),
+            Some('n') => unescaped.push('\n'),
+            Some('r') => unescaped.push('\r'),
+            Some('t') => unescaped.push('\t'),
+            _ => {
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    "DBファイルに不正なエスケープがあります",
+                ));
+            }
+        }
+    }
+
+    Ok(unescaped)
+}
+
 // DBがデータを所有する
 pub struct Database {
     data: HashMap<String, String>,
@@ -45,15 +91,15 @@ impl Database {
 
     // DBの内容をファイルに保存する
     pub fn save(&self, path: &str) -> io::Result<()> {
-        // ファイルへ書き込む文字列を作る
-        let mut contents = String::new();
+        // ヘッダーからファイルを作成する
+        let mut contents = String::from(FORMAT_HEADER);
 
         // DBに保存されているデータを1件ずつ取り出す
         for (key, value) in self.list() {
             // key=value\n という形式で文字列へ追加する
-            contents.push_str(key);
-            contents.push('=');
-            contents.push_str(value);
+            contents.push_str(&escape_field(key));
+            contents.push('\t');
+            contents.push_str(&escape_field(value));
             contents.push('\n');
         }
 
@@ -78,22 +124,39 @@ impl Database {
         // 空のDBを作る
         let mut db = Self::new();
 
-        // ファイルの内容を1行ずつ取り出す
-        for (line_number, line) in contents.lines().enumerate() {
-            // 最初に見つかった「=」を境目として、行番号と合わせてエラーを返す
-            let (key, value) = match line.split_once('=') {
-                Some(pair) => pair,
-                None => {
-                    // 「=」がない行は不正な形式として、行番号と合わせてエラーを返す
-                    return Err(io::Error::new(
-                        io::ErrorKind::InvalidData,
-                        format!("DBファイルの{}行目に「=」がありません", line_number + 1),
-                    ));
-                }
-            };
+        // ヘッダーがあればエスケープ文字列対応版として読み込む
+        if let Some(contents) = contents.strip_prefix(FORMAT_HEADER) {
+            for (line_number, line) in contents.lines().enumerate() {
+                // タブを境目にkey, valueを分ける
+                let (key, value) = match line.split_once('\t') {
+                    Some(pair) => pair,
+                    None => {
+                        return Err(io::Error::new(
+                            io::ErrorKind::InvalidData,
+                            format!("DBファイルの{}行目にタブがありません", line_number + 1),
+                        ));
+                    }
+                };
+                // エスケープされた文字列を元に戻してDBに保存する
+                db.set(unescape_field(key)?, unescape_field(value)?);
+            }
+        } else {
+            // ヘッダーがなければkey=vlaue形式で読み込む
 
-            // &strをStringに変換してからDBに保存する
-            db.set(key.to_string(), value.to_string());
+            for (line_number, line) in contents.lines().enumerate() {
+                // タブを境目にkey, valueを分ける
+                let (key, value) = match line.split_once('=') {
+                    Some(pair) => pair,
+                    None => {
+                        return Err(io::Error::new(
+                            io::ErrorKind::InvalidData,
+                            format!("DBファイルの{}行目に「=」がありません", line_number + 1),
+                        ));
+                    }
+                };
+                // エスケープされた文字列を元に戻してDBに保存する
+                db.set(key.to_string(), value.to_string());
+            }
         }
 
         // contentsの各行を読み取り、DBへ登録する

@@ -47,7 +47,7 @@ fn parse_command(input: &str) -> Command {
     }
 }
 
-// 使用できるコマンドとその用途を表示する
+/// 使用できるコマンドとその用途を表示します。
 fn print_help() {
     println!(
         "Command:

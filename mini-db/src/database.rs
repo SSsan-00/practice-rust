@@ -48,48 +48,47 @@ fn unescape_field(value: &str) -> io::Result<String> {
     Ok(unescaped)
 }
 
-// DBがデータを所有する
+/// キーと値をメモリ上に保存するデータベースです。
 pub struct Database {
     data: HashMap<String, String>,
 }
 
 impl Database {
-    // 空のDBを作成
+    /// 空のデータベースを作成します。
     pub fn new() -> Self {
         Self {
             data: HashMap::new(),
         }
     }
 
-    // keyとvalueの所有権をDBへ渡して保存する
+    /// キーと値を保存します。すでにキーがある場合は、値を置き換えます。
     pub fn set(&mut self, key: String, value: String) {
         self.data.insert(key, value);
     }
 
-    // keyは読むだけなので借用にする
-    // 値がない場合もあるので、Optionを返す
+    /// キーに対応する値を借用して返します。キーが見つからない場合は `None` を返します。
     pub fn get(&self, key: &str) -> Option<&str> {
         self.data.get(key).map(String::as_str)
     }
 
-    // 対応する値を削除する
-    // 削除する値を返し、存在しなければNoneを返す
+    /// キーと値を削除し、削除した値を返します。キーが見つからない場合は `None` を返します。
     pub fn remove(&mut self, key: &str) -> Option<String> {
         self.data.remove(key)
     }
 
-    // DB内のデータを返す
-    // 順番の保証はなし
-    // Iteratorとして使える値を返す
-    // 値(Item)を取り出した時の中身は(&str, &str)
-    // '_ self(DB)より長く生き残らない
+    /// 保存されているキーと値を、順不同のイテレーターとして返します。
+    ///
+    /// 返される文字列スライスは、このデータベースから借用されています。
     pub fn list(&self) -> impl Iterator<Item = (&str, &str)> + '_ {
         self.data
             .iter()
             .map(|(key, value)| (key.as_str(), value.as_str()))
     }
 
-    // DBの内容をファイルに保存する
+    /// 現在のデータを指定したファイルへ保存します。
+    ///
+    /// # Errors
+    /// ファイルへ書き込めない場合はエラーを返します。
     pub fn save(&self, path: &str) -> io::Result<()> {
         // ヘッダーを保存内容の先頭に設定する
         let mut contents = String::from(FORMAT_HEADER);
@@ -108,7 +107,12 @@ impl Database {
         Ok(())
     }
 
-    // ファイルからDBを読み込む
+    /// 指定したファイルからデータベースを読み込みます。
+    ///
+    /// ファイルが存在しない場合は、空のデータベースを作成して保存します。
+    ///
+    /// # Errors
+    /// ファイルを読み書きできない場合や、ファイル形式が不正な場合はエラーを返します。
     pub fn load(path: &str) -> io::Result<Self> {
         // DBファイルがまだ存在しない場合は、空のDBを作成する
         if !Path::new(path).exists() {
@@ -161,17 +165,17 @@ impl Database {
         Ok(db)
     }
 
-    // DBに保存されているデータを全て削除する
+    /// メモリ上のデータをすべて削除します。ファイルへの保存は行いません。
     pub fn clear(&mut self) {
         self.data.clear();
     }
 
-    // 指定したキーがDBに存在するか確認する
+    /// 指定したキーが存在するかどうかを返します。
     pub fn exists(&self, key: &str) -> bool {
         self.data.contains_key(key)
     }
 
-    // 保存されているデータ件数を返す
+    /// 保存されているデータの件数を返します。
     pub fn count(&self) -> usize {
         self.data.len()
     }

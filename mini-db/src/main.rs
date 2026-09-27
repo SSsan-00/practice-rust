@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::io::{self, Write};
+use std::path::Path;
 
 // DBがデータを所有する
 struct Database {
@@ -64,6 +65,13 @@ impl Database {
 
     // ファイルからDBを読み込む
     fn load(path: &str) -> io::Result<Self> {
+        // DBファイルがまだ存在しない場合は、空のDBを作成する
+        if !Path::new(path).exists() {
+            let db = Self::new();
+            db.save(path)?;
+            return Ok(db);
+        }
+
         // ファイル全体を文字列として埋め込む
         let contents = std::fs::read_to_string(path)?;
 
@@ -176,6 +184,7 @@ fn main() -> io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::Database;
+    use std::fs;
 
     #[test]
     fn stores_and_gets_a_value() {
@@ -205,5 +214,48 @@ mod tests {
         let values: Vec<_> = db.list().collect();
 
         assert_eq!(values, vec![("name", "Taro")]);
+    }
+
+    #[test]
+    fn creates_database_file_when_loading_missing_file() {
+        let path = std::env::temp_dir().join("mini-db-load-missing-test.db");
+
+        // 前回のテスト実行でファイルが残っていても、
+        // 「ファイルが無い状態」から確認できるように削除する
+        let _ = fs::remove_file(&path);
+
+        let db = Database::load(path.to_str().unwrap()).unwrap();
+
+        assert!(path.exists());
+        assert_eq!(db.list().count(), 0);
+
+        fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn saves_and_loads_values() {
+        // テスト専用の一時ファイルパスを作る
+        let path = std::env::temp_dir().join("mini-db-save-load-test.db");
+
+        // 前回のテストでファイルが残っている可能性があるので削除する
+        let _ = std::fs::remove_file(&path);
+
+        // 空のDBを作成する
+        let mut db = Database::new();
+
+        // register
+        db.set(String::from("name"), String::from("Taro"));
+        db.set(String::from("age"), String::from("20"));
+        db.save(path.to_str().unwrap()).unwrap();
+
+        // read
+        let loaded_db = Database::load(path.to_str().unwrap()).unwrap();
+
+        // check
+        assert_eq!(loaded_db.get("name"), Some("Taro"));
+        assert_eq!(loaded_db.get("age"), Some("20"));
+
+        // remove
+        std::fs::remove_file(path).unwrap();
     }
 }

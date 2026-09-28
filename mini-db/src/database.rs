@@ -1,6 +1,6 @@
+use crate::storage::Storage;
 use std::collections::HashMap;
 use std::io;
-use std::path::Path;
 
 const FORMAT_HEADER: &str = "mini-db-v2\n";
 
@@ -85,44 +85,38 @@ impl Database {
             .map(|(key, value)| (key.as_str(), value.as_str()))
     }
 
-    /// 現在のデータを指定したファイルへ保存
+    /// Storageを通して現在のデータを保存
     ///
     /// # Errors
-    /// ファイルへ書き込めない場合はエラーになる
-    pub fn save(&self, path: &str) -> io::Result<()> {
-        // ヘッダーを保存内容の先頭に設定する
+    /// Storageでの書き込みに失敗した場合はエラーになる
+    pub fn save(&self, storage: &mut dyn Storage) -> io::Result<()> {
         let mut contents = String::from(FORMAT_HEADER);
 
-        // DBに保存されているデータを1件ずつ取り出す
         for (key, value) in self.list() {
             contents.push_str(&escape_field(key));
             contents.push('\t');
             contents.push_str(&escape_field(value));
             contents.push('\n');
         }
-
-        // 指定されたファイルへ文字列を書き込む
-        std::fs::write(path, contents)?;
-
-        Ok(())
+        storage.write(&contents)
     }
 
-    /// 指定したファイルからデータベースを読み込む
+    /// Storageを通してデータベースを読み込む
     ///
-    /// ファイルがなければ、空のデータベースを作成して保存する
+    /// データがまだない場合は、空のデータベースを作成して保存する
     ///
     /// # Errors
-    /// ファイルを読み書きできない場合や、ファイル形式が不正な場合はエラーになる
-    pub fn load(path: &str) -> io::Result<Self> {
-        // DBファイルがまだ存在しない場合は、空のDBを作成する
-        if !Path::new(path).exists() {
-            let db = Self::new();
-            db.save(path)?;
-            return Ok(db);
-        }
-
-        // ファイル全体を文字列として読み込む
-        let contents = std::fs::read_to_string(path)?;
+    /// Storageでの読み書きに失敗した場合や、データ形式が不正な場合はエラーになる
+    pub fn load(storage: &mut dyn Storage) -> io::Result<Self> {
+        let contents = match storage.read() {
+            Ok(contents) => contents,
+            Err(error) if error.kind() == io::ErrorKind::NotFound => {
+                let db = Self::new();
+                db.save(storage)?;
+                return Ok(db);
+            }
+            Err(error) => return Err(error),
+        };
 
         // 空のDBを作る
         let mut db = Self::new();

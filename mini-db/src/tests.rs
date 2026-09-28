@@ -1,4 +1,5 @@
 use crate::database::Database;
+use crate::storage::FileStorage;
 use std::fs;
 
 #[test]
@@ -39,7 +40,9 @@ fn creates_database_file_when_loading_missing_file() {
     // 「ファイルが無い状態」から確認できるように削除する
     let _ = fs::remove_file(&path);
 
-    let db = Database::load(path.to_str().unwrap()).unwrap();
+    let mut storage = FileStorage::new(path.clone());
+
+    let db = Database::load(&mut storage).unwrap();
 
     assert!(path.exists());
     assert_eq!(db.list().count(), 0);
@@ -56,15 +59,16 @@ fn saves_and_loads_values() {
     let _ = std::fs::remove_file(&path);
 
     // 空のDBを作成する
+    let mut storage = FileStorage::new(path.clone());
     let mut db = Database::new();
 
     // 値を登録
     db.set(String::from("name"), String::from("Taro"));
     db.set(String::from("age"), String::from("20"));
-    db.save(path.to_str().unwrap()).unwrap();
+    db.save(&mut storage).unwrap();
 
     // ファイルから読み込む
-    let loaded_db = Database::load(path.to_str().unwrap()).unwrap();
+    let loaded_db = Database::load(&mut storage).unwrap();
 
     // 読み込んだ値を確認
     assert_eq!(loaded_db.get("name"), Some("Taro"));
@@ -112,13 +116,14 @@ fn saves_and_loads_value_containing_special_characters() {
     let path = std::env::temp_dir().join("mini-db-special_value_test.db");
     let _ = fs::remove_file(&path);
 
+    let mut storage = FileStorage::new(path.clone());
     let mut db = Database::new();
     let value = String::from("first line\nsecond line\\nwith\ttab");
 
     db.set(String::from("message"), value.clone());
-    db.save(path.to_str().unwrap()).unwrap();
+    db.save(&mut storage).unwrap();
 
-    let loaded_db = Database::load(path.to_str().unwrap()).unwrap();
+    let loaded_db = Database::load(&mut storage).unwrap();
 
     assert_eq!(loaded_db.get("message"), Some(value.as_str()));
 
@@ -131,7 +136,8 @@ fn loads_legacy_key_value_format() {
     let path = std::env::temp_dir().join("mini-db-legacy-format-test.db");
     fs::write(&path, "name=Taro\nage=20\n").unwrap();
 
-    let db = Database::load(path.to_str().unwrap()).unwrap();
+    let mut storage = FileStorage::new(path.clone());
+    let db = Database::load(&mut storage).unwrap();
 
     assert_eq!(db.get("name"), Some("Taro"));
     assert_eq!(db.get("age"), Some("20"));

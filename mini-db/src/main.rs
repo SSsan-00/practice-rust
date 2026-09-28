@@ -2,7 +2,7 @@ mod database;
 mod storage;
 
 use std::path::PathBuf;
-use storage::FileStorage;
+use storage::{FileStorage, Storage};
 
 use database::Database;
 use std::io::{self, Write};
@@ -72,8 +72,8 @@ fn main() -> io::Result<()> {
     // 入力を受け取る
     let mut input = String::new();
 
-    let mut storage = FileStorage::new(PathBuf::from("mini.db"));
-    let mut db = Database::load(&mut storage)?;
+    let mut storage: Box<dyn Storage> = Box::new(FileStorage::new(PathBuf::from("mini.db")));
+    let mut db = Database::load(storage.as_mut())?;
 
     'command_loop: loop {
         // 前回の入力を空にする
@@ -110,7 +110,7 @@ fn main() -> io::Result<()> {
 
                     match input.trim() {
                         "y" | "Y" => {
-                            db.save(&mut storage)?;
+                            db.save(storage.as_mut())?;
                             println!("saved");
                             break 'command_loop;
                         }
@@ -143,7 +143,7 @@ fn main() -> io::Result<()> {
                 }
             }
             Command::Save => {
-                db.save(&mut storage)?;
+                db.save(storage.as_mut())?;
                 println!("saved");
             }
             Command::Clear => {

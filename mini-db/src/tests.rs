@@ -1,6 +1,7 @@
 use crate::database::Database;
 use crate::storage::{FileStorage, Storage};
 use std::fs;
+use std::io;
 
 #[test]
 fn stores_and_gets_a_value() {
@@ -143,4 +144,40 @@ fn loads_legacy_key_value_format() {
     assert_eq!(db.get("age"), Some("20"));
 
     fs::remove_file(path).unwrap();
+}
+
+struct MemoryStorage {
+    contents: String,
+}
+
+impl MemoryStorage {
+    fn new() -> Self {
+        Self {
+            contents: String::new(),
+        }
+    }
+}
+
+impl Storage for MemoryStorage {
+    fn read(&self) -> io::Result<String> {
+        Ok(self.contents.clone())
+    }
+
+    fn write(&mut self, contents: &str) -> io::Result<()> {
+        self.contents = contents.to_string();
+        Ok(())
+    }
+}
+
+#[test]
+fn saves_and_loads_values_with_memory_storage() {
+    let mut storage: Box<dyn Storage> = Box::new(MemoryStorage::new());
+    let mut db = Database::new();
+
+    db.set(String::from("name"), String::from("Taro"));
+    db.save(storage.as_mut()).unwrap();
+
+    let loaded_db = Database::load(storage.as_mut()).unwrap();
+
+    assert_eq!(loaded_db.get("name"), Some("Taro"));
 }

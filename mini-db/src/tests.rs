@@ -1,5 +1,5 @@
 use crate::database::Database;
-use crate::storage::FileStorage;
+use crate::storage::{FileStorage, Storage};
 use std::fs;
 
 #[test]
@@ -59,16 +59,16 @@ fn saves_and_loads_values() {
     let _ = std::fs::remove_file(&path);
 
     // 空のDBを作成する
-    let mut storage = FileStorage::new(path.clone());
+    let mut storage: Box<dyn Storage> = Box::new(FileStorage::new(path.clone()));
     let mut db = Database::new();
 
     // 値を登録
     db.set(String::from("name"), String::from("Taro"));
     db.set(String::from("age"), String::from("20"));
-    db.save(&mut storage).unwrap();
+    db.save(storage.as_mut()).unwrap();
 
     // ファイルから読み込む
-    let loaded_db = Database::load(&mut storage).unwrap();
+    let loaded_db = Database::load(storage.as_mut()).unwrap();
 
     // 読み込んだ値を確認
     assert_eq!(loaded_db.get("name"), Some("Taro"));

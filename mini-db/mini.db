@@ -1,2 +1,3 @@
-name=taro
-message=Hello Rust world
+mini-db-v2
+name	taro
+message	Hello Rust world
